@@ -1,60 +1,57 @@
 # Importing the libraries 
 import pandas
-from openpyxl import load_workbook
-
-# Loading the datasets
-Diabetes_Data = pandas.read_csv('data/diabetic_data.csv')
-IDs_Mapping_Data_Dictionaries = load_workbook('data\IDs_mapping.xlsx')
-
-### Extracting the data dictionaries from the IDs_mapping Excel file in order to map the categorical columns to their corresponding values
-IDs_Data_Dictionaries = {}
-# Iterating through the sheets in the Excel file and creating a dictionary for each sheet
-for sheet_name in IDs_Mapping_Data_Dictionaries.sheetnames:
-    IDs_Mapping_Data_Dictionaries = pandas.read_excel('data\IDs_mapping.xlsx', sheet_name=sheet_name)
-    Dictionary_Name = sheet_name.replace(" ", "_").lower()
-    Data_Dictionary = dict(zip(IDs_Mapping_Data_Dictionaries.iloc[:, 0], IDs_Mapping_Data_Dictionaries.iloc[:, 1]))
-    IDs_Data_Dictionaries[Dictionary_Name] = Data_Dictionary
-# Mapping the categorical columns to their corresponding values
-for Dictionary_Name, Data_Dictionary in IDs_Data_Dictionaries.items():
-    Matching_Columns = [col for col in Diabetes_Data.columns if col == Dictionary_Name]
-    for col in Matching_Columns:
-        Diabetes_Data[col] = Diabetes_Data[col].map(Data_Dictionary)
+# Loading the dataset
+Data = pandas.read_csv('data/diabetic_data.csv')
 
 
 
 ### Creating data dictionaries for specific categorical columns 
 # Assigning the desired columns to a list
-columns = ['race', 'gender', 'age', 'weight', 'admission_type_id', 'discharge_disposition_id', 'admission_source_id', 'payer_code', 
-           'medical_specialty', 'max_glu_serum', 'A1Cresult', 'metformin', 'insulin', 'change', 'diabetesMed', 'readmitted']
+columns = ['race', 'gender', 'age', 'weight', 'payer_code', 'medical_specialty', 'max_glu_serum', 'A1Cresult', 'metformin', 'insulin', 'change', 'diabetesMed', 'readmitted']
 # Defining a function to create data dictionaries for the desired columns
-def create_data_dictionary(Diabetes_Data, columns):
+def create_data_dictionary(Data, columns):
     data_dictionaries = {}
     for col in columns:
-        unique_values = Diabetes_Data[col].unique()
+        unique_values = Data[col].unique()
         data_dict = dict(zip(unique_values, range(len(unique_values))))
         data_dictionaries[col] = data_dict
         print(f"Data Dictionary for df.{col}:")
         print(data_dict)
         print()
     return data_dictionaries
-data_dictionaries = create_data_dictionary(Diabetes_Data, columns)
+# Calling the function to create the data dictionaries
+data_dictionaries = create_data_dictionary(Data, columns)
 
+# Defining a function to group the values in a column by a specified range
+def group_by_range(df, col_name, n):
+    df_sorted = df.sort_values(col_name)
+    min_val = df_sorted[col_name].min()
+    max_val = df_sorted[col_name].max()
+    num_groups = int((max_val - min_val) / n) + 1
+    group_labels = [f"{min_val + i*n}-{min_val + (i+1)*n-1}" for i in range(num_groups)]
+    df_sorted[col_name] = pandas.cut(df_sorted[col_name], bins=num_groups, labels=group_labels, include_lowest=True)
+    return df_sorted
+# Calling the function to group the values in the 'time_in_hospital' column by a range of 5
+Data = group_by_range(Data, 'time_in_hospital', 5)
 
 
 ### Cleaning the dataset
 # Replacing '?' and empty cells with NaN
-Diabetes_Data.replace('?', pandas.np.nan, inplace=True)
-Diabetes_Data.replace('', pandas.np.nan, inplace=True)
+Data.replace('?', pandas.np.nan, inplace=True)
+Data.replace('', pandas.np.nan, inplace=True)
 # Dropping the cells with Nan values
-Diabetes_Data = Diabetes_Data.dropna()
+Data = Data.dropna()
 # Counting the number of NaN values remaining in each column to ensure dataset was cleaned properly
-print(Diabetes_Data.isna().sum())
+print(Data.isna().sum())
 
 
 
-### Reformatting Categorical Columns with their corresponding dictionary values
+### Reformatting Categorial Columns with their corresponding dictionary values
 for col, data_dict in data_dictionaries.items():
-    Diabetes_Data[col].replace(data_dict, inplace=True)
+    Data[col].replace(data_dict, inplace=True)
+
+
+
 ### Exporting the data dictionaries to an Excel file
 writer = pandas.ExcelWriter('data/diabetic_data_dictionaries.xlsx')
 for col, data_dict in data_dictionaries.items():
@@ -64,7 +61,9 @@ writer.save()
 
 
 ### Removing the unwanted columns
-Diabetes_Data = Diabetes_Data [['encounter_id', 'patient_nbr', 'race', 'gender', 'age', 'weight', 'admission_type_id', 'discharge_disposition_id', 'admission_source_id',
-            'payer_code', 'medical_specialty', 'max_glu_serum', 'A1Cresult', 'metformin', 'insulin', 'change', 'diabetesMed', 'readmitted']]
+Data = Data [['encounter_id', 'patient_nbr', 'race', 'gender', 'age', 'weight', 'payer_code', 'medical_specialty', 'max_glu_serum', 'A1Cresult', 'metformin', 'insulin', 'change', 'diabetesMed', 'readmitted']]
+
+
+
 ### Exporting the cleaned dataset
-Diabetes_Data.to_csv('New_Diabetic_Data.csv', index=False)
+Data.to_csv('data/new_diabetic_data_cleaned.csv', index=False)
