@@ -129,10 +129,9 @@ data_dictionaries = create_data_dictionary(Data, columns)
 
 ### Cleaning the dataset
 
-# Replacing '?' and empty cells with NaN and dropping the cells with NaN values
+# Replacing '?' and empty cells with NaN 
 Data.replace('?', pandas.np.nan, inplace=True)
 Data.replace('', pandas.np.nan, inplace=True)
-Data = Data.dropna()
 # Counting the number of NaN values remaining in each column to ensure dataset was cleaned properly
 print(Data.isna().sum())
 # Reformatting Categorical Columns with their corresponding dictionary values
