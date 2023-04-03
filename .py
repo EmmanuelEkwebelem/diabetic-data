@@ -3,8 +3,6 @@ import pandas
 # Loading the dataset
 Data = pandas.read_csv('data/diabetic_data.csv')
 
-
-
 ### Creating data dictionaries for specific categorical columns 
 # Assigning the desired columns to a list
 columns = ['race', 'gender', 'age', 'weight', 'payer_code', 'medical_specialty', 'max_glu_serum', 'A1Cresult', 'metformin', 'insulin', 'change', 'diabetesMed', 'readmitted']
@@ -34,7 +32,6 @@ def group_by_range(df, col_name, n):
 # Calling the function to group the values in the 'time_in_hospital' column by a range of 5
 Data = group_by_range(Data, 'time_in_hospital', 5)
 
-
 ### Cleaning the dataset
 # Replacing '?' and empty cells with NaN
 Data.replace('?', pandas.np.nan, inplace=True)
@@ -44,13 +41,9 @@ Data = Data.dropna()
 # Counting the number of NaN values remaining in each column to ensure dataset was cleaned properly
 print(Data.isna().sum())
 
-
-
 ### Reformatting Categorial Columns with their corresponding dictionary values
 for col, data_dict in data_dictionaries.items():
     Data[col].replace(data_dict, inplace=True)
-
-
 
 ### Exporting the data dictionaries to an Excel file
 writer = pandas.ExcelWriter('data/diabetic_data_dictionaries.xlsx')
@@ -58,12 +51,8 @@ for col, data_dict in data_dictionaries.items():
     pandas.DataFrame.from_dict(data_dict, orient="index").to_excel(writer, sheet_name=col)
 writer.save()
 
-
-
 ### Removing the unwanted columns
 Data = Data [['encounter_id', 'patient_nbr', 'race', 'gender', 'age', 'weight', 'payer_code', 'medical_specialty', 'max_glu_serum', 'A1Cresult', 'metformin', 'insulin', 'change', 'diabetesMed', 'readmitted']]
-
-
 
 ### Exporting the cleaned dataset
 Data.to_csv('data/new_diabetic_data_cleaned.csv', index=False)
