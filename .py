@@ -7,7 +7,7 @@ Data = pandas.read_csv('data/diabetic_data.csv')
 
 ### Reformatting the dataset
 # Replacing the 'ch' values in the 'change' column to 'change'
-Data['change'] = Data['change'].str.replace('ch', 'change')
+Data['change'] = Data['change'].str.replace('Ch', 'change')
 # Defining a function to group the values in a column by a specified range
 def group_by_range(df, col_name, n):
     df_sorted = df.sort_values(col_name)
@@ -147,7 +147,7 @@ writer.save()
 Data = Data [['encounter_id', 'patient_nbr', 'race', 'gender', 'age', 'weight', 'admission_type_id', 'discharge_disposition_id', 
            'admission_source_id', 'time_in_hospital', 'payer_code', 'medical_specialty', 'num_lab_procedures', 'num_procedures', 
            'num_medications', 'number_outpatient', 'number_emergency', 'number_inpatient', 'diag_1', 'diag_2', 'diag_3', 
-           'number_diagnoses', 'max_glu_serum', 'A1Cresult', 'metformin', 'change', 'diabetesMed', 'readmitted']]
+           'number_diagnoses', 'max_glu_serum', 'A1Cresult', 'insulin', 'metformin', 'change', 'diabetesMed', 'readmitted']]
 
 ### Exporting the cleaned dataset
 Data.to_csv('data/new_diabetic_data_cleaned.csv', index=False)
