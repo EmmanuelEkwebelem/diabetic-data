@@ -22,3 +22,5 @@ After training and evaluation, the results show that the Decision Tree algorithm
 Considering the evaluation metrics of all the models, it can be concluded that the Catboost model performed the best with an AUC of 0.609, which is the highest among all the models. The recall score is the highest for the Decision Tree model after performing hyper-parameter tuning with a value of 0.804. However, the Decision Tree model is still not able to outperform the other models in terms of AUC score. Hence, the Catboost model is considered the best algorithm to use for this binary classification task.
 
 
+
+
